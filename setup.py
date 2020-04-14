@@ -155,7 +155,9 @@ def setup(elfPath: str, breakpoints: str, progArgs: List[str] = None, extraGdbSe
             cmd = f.read()
         cmd = cmd.split('\x00')[:-1]
         cmd = ' '.join(cmd)
-        pattern = re.compile("--docker\s+True\s", re.IGNORECASE)
+        pattern = re.compile("--docker\s+True\s*", re.IGNORECASE)
+        cmd = pattern.sub('', cmd)
+        pattern = re.compile("--docker\s*", re.IGNORECASE)
         cmd = pattern.sub('', cmd)
         cmd = [x for x in cmd.split()]
         cmd.insert(2, '--inside-docker')

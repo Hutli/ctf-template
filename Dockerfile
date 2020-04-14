@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 
 RUN apt-get update
-RUN apt-get -y install git tmux python3 python3-pip wget vim gdb gdbserver vim nano locales seccomp libc6-dbg libc6:i386 libc6-dbg:i386
+RUN apt-get -y install git tmux python3 python3-pip wget vim gdb gdbserver vim nano locales seccomp libc6-dbg
 RUN wget -O /opt/.gdbinit-gef.py -q https://github.com/hugsy/gef/raw/master/gef.py
 RUN git clone https://github.com/pwndbg/pwndbg /opt/pwndbg
 RUN pip3 install --upgrade pwntools
