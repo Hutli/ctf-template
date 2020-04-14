@@ -8,6 +8,7 @@ import stat
 import subprocess
 from time import sleep
 import atexit
+import re
 
 #settings
 terminalSetting = ['urxvt', '-e', 'zsh', '-c']
@@ -153,8 +154,12 @@ def setup(elfPath: str, breakpoints: str, progArgs: List[str] = None, extraGdbSe
         with open('/proc/self/cmdline') as f:
             cmd = f.read()
         cmd = cmd.split('\x00')[:-1]
-        cmd = [x for x in cmd if 'docker' not in x]
-        cmd = ' '.join(cmd) + ' --inside-docker'
+        cmd = ' '.join(cmd)
+        pattern = re.compile("--docker\s+True\s", re.IGNORECASE)
+        cmd = pattern.sub('', cmd)
+        cmd = [x for x in cmd.split()]
+        cmd.insert(2, '--inside-docker')
+        cmd = ' '.join(cmd)
         containerName = elfPath.replace('/', '').replace('\\', '').lower()
         p = subprocess.run('docker image ls'.split(), capture_output=True)
         out = p.stdout.decode('utf-8')
@@ -185,6 +190,7 @@ def setup(elfPath: str, breakpoints: str, progArgs: List[str] = None, extraGdbSe
             f.write('#!/bin/bash\n')
             f.write(f'tmux send-keys -t debug.0 "{cmd}" ENTER\n')
         
+        p = subprocess.run(f'docker cp setup.py {containerName}:/root/setup.py'.split(), capture_output=True)
         p = subprocess.run(f'docker cp exploit.py {containerName}:/root/exploit.py'.split(), capture_output=True)
         p = subprocess.run(f'docker cp .debugDocker.sh {containerName}:/root/.debugDocker.sh'.split(), capture_output=True)
         p = subprocess.run(f'docker exec -it {containerName} chmod +x /root/.debugDocker.sh'.split(), capture_output=True)
@@ -296,4 +302,4 @@ def setup(elfPath: str, breakpoints: str, progArgs: List[str] = None, extraGdbSe
         onegadget = args.onegadget[0]
         onegadget = int(args.onegadget[0], 16) if onegadget[0:2] == '0x' else int(onegadget)
         return io, pid, elf, libc, ld, onegadget
-    return io, pid, elf, libc, ld, None
+    return io, pid, elf, libc, ld, None if not args.onegadget else onegadget
