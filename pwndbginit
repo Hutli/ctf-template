@@ -1,1 +1,2 @@
 source /opt/pwndbg/gdbinit.py
+source ./setupSplit.py
