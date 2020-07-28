@@ -233,7 +233,7 @@ def setup(elfPath: str, breakpoints: str, progArgs: List[str] = None, extraGdbSe
         quit()
 
     if args.patch:
-        newPath = '/tmp/patchedExec'
+        newPath = './patchedExec'
         copyfile(elfPath, newPath)
         cmd = 'patchelf --set-interpreter ' + args.ld + ' ' + newPath
         log.info('patching elf: ' + cmd)
